@@ -4,6 +4,8 @@ import sys
 
 LDI = 0b10000010
 PRN = 0b01000111
+HLT = 0b00000001
+
 
 class CPU:
     """Main CPU class."""
@@ -13,6 +15,11 @@ class CPU:
         self.ram = [0] * 256    # 256 bytes of memory
         self.reg = [0] * 8      # 8 general-purpose registers
         self.pc = 0
+        self.instructions = {
+            HLT: self.HLT,
+            LDI: self.LDI,
+            PRN: self.PRN
+        }
 
     def ram_read(self, mar):
         return self.ram[mar]
@@ -81,7 +88,16 @@ class CPU:
 
             set_pc = ir >> 4 & 0b0001
 
-            ##
-
+            self.branchtable[ir](operand_a, operand_b)
+            
             if not set_pc:
                 self.pc += instruction_length
+
+    def LDI(self, reg_num, value):
+        self.reg[reg_num] = value
+
+    def PRN(self, reg_num, _):
+        print(self.reg[reg_num])
+
+    def HLT(self, *_):
+        sys.exit()
