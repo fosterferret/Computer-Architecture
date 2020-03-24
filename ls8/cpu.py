@@ -88,8 +88,8 @@ class CPU:
 
             set_pc = ir >> 4 & 0b0001
 
-            self.branchtable[ir](operand_a, operand_b)
-            
+            self.instructions[ir](operand_a, operand_b)
+
             if not set_pc:
                 self.pc += instruction_length
 
