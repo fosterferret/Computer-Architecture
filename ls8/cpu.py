@@ -12,8 +12,8 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        self.ram = [0] * 256    # 256 bytes of memory
-        self.reg = [0] * 8      # 8 general-purpose registers
+        self.ram = [0] * 256
+        self.reg = [0] * 8
         self.pc = 0
         self.instructions = {
             HLT: self.HLT,
@@ -27,26 +27,22 @@ class CPU:
     def ram_write(self, mdr, mar):
         self.ram[mar] = mdr
 
-    def load(self):
+    def load(self, program):
         """Load a program into memory."""
-
-        address = 0
-
-        # For now, we've just hardcoded a program:
-
-        program = [
-            # From print8.ls8
-            0b10000010,  # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111,  # PRN R0
-            0b00000000,
-            0b00000001,  # HLT
-        ]
-
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+        try:
+            address = 0
+            with open(program) as file:
+                for line in file:
+                    line = line.split('#')[0]
+                    line = line.strip()
+                    if line == '':
+                        continue
+                    instruction = int(line, 2)
+                    self.ram_write(instruction, address)
+                    address += 1
+        except FileNotFoundError:
+            print('ERROR: No valid file name')
+            sys.exit(2)
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
