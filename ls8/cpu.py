@@ -6,6 +6,9 @@ MUL = 0b10100010
 LDI = 0b10000010
 PRN = 0b01000111
 HLT = 0b00000001
+PUSH = 0b01000101
+POP = 0b01000110
+SP = 7
 
 
 class CPU:
@@ -15,12 +18,15 @@ class CPU:
         """Construct a new CPU."""
         self.ram = [0] * 256
         self.reg = [0] * 8
+        self.reg[SP] = 0xF4
         self.pc = 0
         self.instructions = {
             HLT: self.HLT,
             LDI: self.LDI,
             PRN: self.PRN,
-            MUL: self.ALU_MUL
+            MUL: self.ALU_MUL,
+            PUSH: self.PUSH,
+            POP: self.POP
         }
 
     def ram_read(self, mar):
@@ -99,6 +105,16 @@ class CPU:
 
     def HLT(self, *_):
         sys.exit()
-    
+
+    def POP(self, reg_num, _):
+        value = self.ram_read(self.reg[SP])
+        self.reg[reg_num] = value
+        self.reg[SP] += 1
+
+    def PUSH(self, reg_num, _):
+        value = self.reg[reg_num]
+        self.reg[SP] -= 1
+        self.ram_write(value, self.reg[SP])
+
     def ALU_MUL(self, reg_a, reg_b):
         self.reg[reg_a] *= self.reg[reg_b]
