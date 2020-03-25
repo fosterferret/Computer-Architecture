@@ -2,6 +2,7 @@
 
 import sys
 
+MUL = 0b10100010
 LDI = 0b10000010
 PRN = 0b01000111
 HLT = 0b00000001
@@ -18,7 +19,8 @@ class CPU:
         self.instructions = {
             HLT: self.HLT,
             LDI: self.LDI,
-            PRN: self.PRN
+            PRN: self.PRN,
+            MUL: self.ALU_MUL
         }
 
     def ram_read(self, mar):
@@ -97,3 +99,6 @@ class CPU:
 
     def HLT(self, *_):
         sys.exit()
+    
+    def ALU_MUL(self, reg_a, reg_b):
+        self.reg[reg_a] *= self.reg[reg_b]
