@@ -8,6 +8,9 @@ PRN = 0b01000111
 HLT = 0b00000001
 PUSH = 0b01000101
 POP = 0b01000110
+CALL = 0b1010000
+
+
 SP = 7
 
 
@@ -20,13 +23,14 @@ class CPU:
         self.reg = [0] * 8
         self.reg[SP] = 0xF4
         self.pc = 0
-        self.instructions = {
+        self.branch_table = {
             HLT: self.HLT,
             LDI: self.LDI,
             PRN: self.PRN,
             MUL: self.ALU_MUL,
             PUSH: self.PUSH,
-            POP: self.POP
+            POP: self.POP,
+            CALL: self.CALL
         }
 
     def ram_read(self, mar):
@@ -92,7 +96,7 @@ class CPU:
 
             set_pc = ir >> 4 & 0b0001
 
-            self.instructions[ir](operand_a, operand_b)
+            self.branch_table[ir](operand_a, operand_b)
 
             if not set_pc:
                 self.pc += instruction_length
@@ -118,3 +122,9 @@ class CPU:
 
     def ALU_MUL(self, reg_a, reg_b):
         self.reg[reg_a] *= self.reg[reg_b]
+
+    def CALL(self, reg_num, _):
+        self.reg[SP] -= 1
+        return_address = self.pc + 2
+        self.ram_write(return_address, self.reg[SP])
+        self.pc = self.reg[reg_num]
