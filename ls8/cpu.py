@@ -9,6 +9,9 @@ HLT = 0b00000001
 PUSH = 0b01000101
 POP = 0b01000110
 CALL = 0b1010000
+RET = 0b00010001
+JMP = 0b01010100
+JNE = 0b01010110
 
 
 SP = 7
@@ -23,6 +26,7 @@ class CPU:
         self.reg = [0] * 8
         self.reg[SP] = 0xF4
         self.pc = 0
+        self.fl = 0
         self.branch_table = {
             HLT: self.HLT,
             LDI: self.LDI,
@@ -30,7 +34,10 @@ class CPU:
             MUL: self.ALU_MUL,
             PUSH: self.PUSH,
             POP: self.POP,
-            CALL: self.CALL
+            CALL: self.CALL,
+            RET: self.RET,
+            JMP: self.JMP,
+            JNE: self.JNE
         }
 
     def ram_read(self, mar):
@@ -128,7 +135,21 @@ class CPU:
         return_address = self.pc + 2
         self.ram_write(return_address, self.reg[SP])
         self.pc = self.reg[reg_num]
-    
+
     def RET(self, *_):
         self.pc = self.ram_read(self.reg[SP])
         self.reg[SP] += 1
+
+    def JMP(self, reg_num, _):
+        self.pc = self.reg[reg_num]
+
+    def JNE(self, reg_num, _):
+        if self.fl is False & or self.fl is 0:
+            self.JMP(reg_num, _)
+        else:
+            self.pc += 2
+    def JEQ(self, reg_num, _):
+        if self.fl & 1:
+            self.JMP(reg_num, _)
+        else:
+            self.pc += 2
