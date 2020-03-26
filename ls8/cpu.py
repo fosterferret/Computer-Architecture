@@ -128,3 +128,7 @@ class CPU:
         return_address = self.pc + 2
         self.ram_write(return_address, self.reg[SP])
         self.pc = self.reg[reg_num]
+    
+    def RET(self, *_):
+        self.pc = self.ram_read(self.reg[SP])
+        self.reg[SP] += 1
