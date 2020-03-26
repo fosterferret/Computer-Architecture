@@ -2,17 +2,19 @@
 
 import sys
 
+ADD = 0b10100000
+
 MUL = 0b10100010
 LDI = 0b10000010
 PRN = 0b01000111
 HLT = 0b00000001
 PUSH = 0b01000101
 POP = 0b01000110
-CALL = 0b1010000
+CALL = 0b01010000
 RET = 0b00010001
 JMP = 0b01010100
 JNE = 0b01010110
-
+JEQ = 0b01010101
 
 SP = 7
 
@@ -36,8 +38,10 @@ class CPU:
             POP: self.POP,
             CALL: self.CALL,
             RET: self.RET,
-            JMP: self.JMP,
-            JNE: self.JNE
+            ADD: self.ALU_ADD
+            # JMP: self.JMP,
+            # JNE: self.JNE,
+            # JEQ: self.JEQ
         }
 
     def ram_read(self, mar):
@@ -102,7 +106,6 @@ class CPU:
             instruction_length = operand_count + 1
 
             set_pc = ir >> 4 & 0b0001
-
             self.branch_table[ir](operand_a, operand_b)
 
             if not set_pc:
@@ -129,6 +132,9 @@ class CPU:
 
     def ALU_MUL(self, reg_a, reg_b):
         self.reg[reg_a] *= self.reg[reg_b]
+    
+    def ALU_ADD(self, reg_a, reg_b):
+        self.reg[reg_a] += self.reg[reg_b]
 
     def CALL(self, reg_num, _):
         self.reg[SP] -= 1
@@ -140,16 +146,17 @@ class CPU:
         self.pc = self.ram_read(self.reg[SP])
         self.reg[SP] += 1
 
-    def JMP(self, reg_num, _):
-        self.pc = self.reg[reg_num]
+    # def JMP(self, reg_num, _):
+    #     self.pc = self.reg[reg_num]
 
-    def JNE(self, reg_num, _):
-        if self.fl is False & or self.fl is 0:
-            self.JMP(reg_num, _)
-        else:
-            self.pc += 2
-    def JEQ(self, reg_num, _):
-        if self.fl & 1:
-            self.JMP(reg_num, _)
-        else:
-            self.pc += 2
+    # def JNE(self, reg_num, _):
+    #     if self.fl & 1 == 0:
+    #         self.JMP(reg_num, _)
+    #     else:
+    #         self.pc += 2
+
+    # def JEQ(self, reg_num, _):
+    #     if self.fl & 1:
+    #         self.JMP(reg_num, _)
+    #     else:
+    #         self.pc += 2
